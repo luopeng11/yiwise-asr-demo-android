@@ -6,4 +6,3 @@ local.properties
 build
 captures
 .cxx/
-android-sign-keys/
