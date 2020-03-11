@@ -1,6 +1,5 @@
 package com.yiwise.asr.demo.activity;
 
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -12,14 +11,31 @@ import com.yiwise.asr.AsrClientFactory;
 import com.yiwise.asr.AsrRecognizer;
 import com.yiwise.asr.AsrRecognizerListener;
 import com.yiwise.asr.common.client.protocol.AsrRecognizerResult;
-import com.yiwise.asr.demo.ThreadUtils;
+import com.yiwise.asr.demo.utils.PropertiesLoader;
+import com.yiwise.asr.demo.utils.ThreadUtils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.Properties;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     private TextView textView;
+
+    private String gatewayUrl;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String audioFileName;
+    private Long hotWordId;
+    private Float selfLearningRatio;
+    private Long selfLearningModelId;
+    private boolean enablePunctuation;
+    private boolean enableIntermediateResult;
+    private boolean enableInverseTextNormalization;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,26 +43,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.text);
 
-        String gatewayUrl = "https://asr-gateway.yiwise.com";
-        String accessKeyId = "DEMO867JHSKHFSK";
-        String accessKeySecret = "DlFSDjlsf87SDJFO";
 
-        AsrClientFactory.init(gatewayUrl, accessKeyId, accessKeySecret);
+        try (InputStream stream = getResources().getAssets().open("config.properties")) {
+            Properties properties = PropertiesLoader.loadProperties(stream);
 
-        ThreadUtils.getInstance().execute(() -> {
-            process();
-        });
+            gatewayUrl = properties.getProperty("gatewayUrl", "http://127.0.0.1:6060");
+            accessKeyId = properties.getProperty("accessKeyId");
+            accessKeySecret = properties.getProperty("accessKeySecret");
+            audioFileName = properties.getProperty("audioFileName", "test.wav");
+            hotWordId = StringUtils.isEmpty(properties.getProperty("hotWordId")) ? null : Long.valueOf(properties.getProperty("hotWordId"));
+            selfLearningRatio = StringUtils.isEmpty(properties.getProperty("selfLearningRatio")) ? null : Float.valueOf(properties.getProperty("selfLearningRatio"));
+            selfLearningModelId = StringUtils.isEmpty(properties.getProperty("selfLearningModelId")) ? null : Long.valueOf(properties.getProperty("selfLearningModelId"));
+            enablePunctuation = Boolean.valueOf(properties.getProperty("enablePunctuation", "false"));
+            enableIntermediateResult = Boolean.valueOf(properties.getProperty("enableIntermediateResult", "false"));
+            enableInverseTextNormalization = Boolean.valueOf(properties.getProperty("enableInverseTextNormalization", "true"));
+
+            // 初始化客户端
+            AsrClientFactory.init(gatewayUrl, accessKeyId, accessKeySecret);
+
+            // 启动识别
+            ThreadUtils.getInstance().execute(this::process);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void process() {
-        String audioFileName = "01.wav";
-        AssetManager assetManager = this.getAssets();
-        try {
+        try (InputStream fileInputStream = getResources().getAssets().open(audioFileName)) {
             final StringBuilder sb = new StringBuilder();
 
             AsrClient asrClient = AsrClientFactory.getAsrClient();
-
-            InputStream fileInputStream = assetManager.open("01.wav");
 
             // 丢弃wav的头文件
             if (audioFileName.endsWith(".wav")) {
@@ -61,29 +87,41 @@ public class MainActivity extends AppCompatActivity {
                 public void onSentenceBegin(AsrRecognizerResult result) {
                     // 请不要再此进行耗时操作，进行耗时操作可能引发一些不可预知问题；
                     // 如需进行耗时操作，请另外开辟线程执行
-                    System.out.println("SentenceBegin----" + result.toString());
+                    logger.info("SentenceBegin----" + result.toString());
                 }
 
                 // 一句话的中间结果
                 public void onSentenceBeginChanged(AsrRecognizerResult result) {
                     // 请不要再此进行耗时操作，进行耗时操作可能引发一些不可预知问题；
                     // 如需进行耗时操作，请另外开辟线程执行
-                    System.out.println("SentenceChanged--" + result.toString());
+                    logger.info("SentenceChanged--" + result.toString());
                 }
 
                 // 一句话的结束事件
                 public void onSentenceEnd(AsrRecognizerResult result) {
                     // 请不要再此进行耗时操作，进行耗时操作可能引发一些不可预知问题；
                     // 如需进行耗时操作，请另外开辟线程执行
-                    System.out.println("SentenceEnd-----" + result.toString());
+                    logger.info("SentenceEnd-----" + result.toString());
                     sb.append(result.getResultText());
 
-                    ThreadUtils.getInstance().runOnUiThread(() -> {
-                        textView.setText(sb.toString());
-                    });
+                    // 在UI界面上更新最后结果
+                    ThreadUtils.getInstance().runOnUiThread(() -> textView.setText(sb.toString()));
                 }
             });
 
+            // 设置参数
+            // 热词id
+            asrRecognizer.setHotWordId(hotWordId);
+            // 是否打标点
+            asrRecognizer.setEnablePunctuation(enablePunctuation);
+            // 是否返回中间结果
+            asrRecognizer.setEnableIntermediateResult(enableIntermediateResult);
+            // 自学习模型
+            asrRecognizer.setSelfLearningModelId(selfLearningModelId);
+            // 自学习模型比率
+            asrRecognizer.setSelfLearningRatio(selfLearningRatio);
+            // 是否开启逆文本功能
+            asrRecognizer.setEnableInverseTextNormalization(enableInverseTextNormalization);
 
             // 开启asr识别
             asrRecognizer.startAsr();
@@ -98,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             // 停止ASR识别（发送停止识别后，最后的识别结果返回可能有一定延迟）
             asrRecognizer.stopAsr();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("识别过程出现错误", e);
         }
     }
 

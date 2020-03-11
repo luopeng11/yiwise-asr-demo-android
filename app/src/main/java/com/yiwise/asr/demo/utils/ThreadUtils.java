@@ -1,4 +1,4 @@
-package com.yiwise.asr.demo;
+package com.yiwise.asr.demo.utils;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class ThreadUtils {
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
-    private Handler mHandler = new Handler(Looper.myLooper());
 
     private ThreadPoolExecutor mThreadPoolExecutor;
 
