@@ -1,6 +1,18 @@
 ### 注意事项
 1. 可在assets文件夹下的config.properties文件中修改相关配置；
-
+2. 编译时如果报错```More than one file was found with OS independent path 'META-INF/io.netty.versions.properties'```，在app的build.gradle中添加
+    ```
+    android {
+        // 其它配置项
+    
+        packagingOptions {
+            exclude 'META-INF/*'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/INDEX.LIST'
+        }
+    }
+    ```
 
 ### SDK的Gradle地址
 ```
