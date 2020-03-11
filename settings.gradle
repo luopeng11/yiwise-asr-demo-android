@@ -1,2 +1,2 @@
-include ':app', ':yiwise-asr-sdk'
-rootProject.name='yiwise-asr-demo-android'
+include ':app'
+rootProject.name = 'yiwise-asr-demo-android'
