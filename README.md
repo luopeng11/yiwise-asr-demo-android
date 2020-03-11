@@ -14,7 +14,7 @@
     }
     ```
 
-### SDK的Gradle地址
+### SDK的Gradle配置
 ```
 implementation('com.yiwise:asr-client-sdk:1.0.8-RELEASE') {
     exclude group: 'io.netty', module: 'netty-all'
