@@ -1,11 +1,9 @@
 package com.yiwise.asr.demo.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.yiwise.asr.AsrRecognizer;
 import com.yiwise.asr.demo.R;
@@ -20,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 使用录音方式的实时语音流DEMO
  */
-public class RecordRealTimeActivity extends AppCompatActivity {
+public class RecordRealTimeActivity extends Activity {
     private static Logger logger = LoggerFactory.getLogger(RecordRealTimeActivity.class);
 
     private AsrHandler asrHandler;
@@ -30,7 +28,7 @@ public class RecordRealTimeActivity extends AppCompatActivity {
     private RecordTask recordTask;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recordrealtime);
 

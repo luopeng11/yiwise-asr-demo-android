@@ -1,14 +1,12 @@
 package com.yiwise.asr.demo.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.yiwise.asr.demo.R;
 import com.yiwise.asr.demo.utils.PermissionUtil;
@@ -16,11 +14,11 @@ import com.yiwise.asr.demo.utils.PermissionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     private static Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -32,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
      * 复查权限
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0) {
             for (int grantResult : grantResults) {

@@ -1,9 +1,8 @@
 package com.yiwise.asr.demo.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.yiwise.asr.AsrRecognizer;
 import com.yiwise.asr.demo.R;
@@ -19,14 +18,14 @@ import java.io.InputStream;
 /**
  * 使用文件模拟实时语音流DEMO
  */
-public class FileRealTimeActivity extends AppCompatActivity {
+public class FileRealTimeActivity extends Activity {
     private static Logger logger = LoggerFactory.getLogger(FileRealTimeActivity.class);
 
     private AsrHandler asrHandler;
     private ResultViewHandler resultViewHandler;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filerealtime);
 
