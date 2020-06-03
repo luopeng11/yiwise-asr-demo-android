@@ -39,5 +39,5 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.26'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
-    implementation 'com.yiwise:asr-client-sdk:1.1.0-RELEASE'
+    implementation 'com.yiwise:asr-client-sdk:1.1.1-RELEASE'
 }
